@@ -8,12 +8,18 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import lk.ijse.dep11.pos.db.CustomerDataAccess;
+import lk.ijse.dep11.pos.tm.Customer;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.SQLException;
+import java.util.List;
 
 public class ManageCustomerFormController {
     public AnchorPane root;
@@ -22,7 +28,23 @@ public class ManageCustomerFormController {
     public JFXTextField txtCustomerAddress;
     public JFXButton btnSave;
     public JFXButton btnDelete;
-    public TableView tblCustomers;
+    public TableView<Customer> tblCustomers;
+    public JFXButton btnAddNew;
+
+
+    public void initialize(){
+
+        String[] tblColumns = {"id","name","address"};
+        for (int i = 0; i < tblColumns.length; i++) {
+            tblCustomers.getColumns().get(i).setCellValueFactory(new PropertyValueFactory<>(tblColumns[i]));
+        }
+
+        tblCustomers.getItems().addAll((CustomerDataAccess.getAllCustomers()));
+        btnDelete.setDisable(true);
+        txtCustomerId.setEditable(false);
+        btnSave.setDefaultButton(true);
+        btnAddNew.fire();
+    }
 
     public void navigateToHome(MouseEvent mouseEvent) throws IOException {
         URL resource = this.getClass().getResource("/view/MainForm.fxml");
@@ -35,6 +57,22 @@ public class ManageCustomerFormController {
     }
 
     public void btnAddNew_OnAction(ActionEvent actionEvent) {
+        for (TextField textField : new TextField[]{txtCustomerId,txtCustomerName,txtCustomerAddress})
+            textField.clear();
+        tblCustomers.getSelectionModel().clearSelection();
+        txtCustomerName.requestFocus();
+
+        try {
+            String lastCustomerId = CustomerDataAccess.getLastId();
+            if (lastCustomerId == null){
+                txtCustomerId.setText("C001");
+            }else {
+                int newId = Integer.parseInt(lastCustomerId.substring(1))+1;
+                txtCustomerId.setText(String.format("C%03d",newId));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void btnSave_OnAction(ActionEvent actionEvent) {
