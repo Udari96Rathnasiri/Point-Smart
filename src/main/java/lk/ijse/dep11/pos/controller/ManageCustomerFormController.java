@@ -3,10 +3,12 @@ package lk.ijse.dep11.pos.controller;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -32,18 +34,32 @@ public class ManageCustomerFormController {
     public JFXButton btnAddNew;
 
 
-    public void initialize(){
+    public void initialize() throws SQLException {
 
         String[] tblColumns = {"id","name","address"};
         for (int i = 0; i < tblColumns.length; i++) {
             tblCustomers.getColumns().get(i).setCellValueFactory(new PropertyValueFactory<>(tblColumns[i]));
         }
-
-        tblCustomers.getItems().addAll((CustomerDataAccess.getAllCustomers()));
         btnDelete.setDisable(true);
         txtCustomerId.setEditable(false);
         btnSave.setDefaultButton(true);
         btnAddNew.fire();
+
+        tblCustomers.getItems().addAll((CustomerDataAccess.getAllCustomers()));
+
+        tblCustomers.getSelectionModel().selectedItemProperty().addListener((ov,prev,cur) -> {
+            if (cur != null){
+                btnSave.setText("UPDATE");
+                btnDelete.setDisable(false);
+                txtCustomerId.setText(cur.getId());
+                txtCustomerName.setText(cur.getName());
+                txtCustomerAddress.setText(cur.getAddress());
+            }else {
+                btnSave.setText("SAVE");
+                btnDelete.setDisable(true);
+            }
+        });
+        Platform.runLater(txtCustomerName::requestFocus);
     }
 
     public void navigateToHome(MouseEvent mouseEvent) throws IOException {
@@ -76,8 +92,47 @@ public class ManageCustomerFormController {
     }
 
     public void btnSave_OnAction(ActionEvent actionEvent) {
+        if (!isDataValid()) return;
+
+        String id = txtCustomerId.getText().strip();
+        String name = txtCustomerName.getText().strip();
+        String address = txtCustomerAddress.getText().strip();
+        Customer customer = new Customer(id, name, address);
+        try {
+            if(btnSave.getText().equals("SAVE")) {
+                CustomerDataAccess.saveCustomer(customer);
+                tblCustomers.getItems().add(customer);
+            }else{
+                CustomerDataAccess.updateCustomer(customer);
+                ObservableList<Customer> customerList = tblCustomers.getItems();
+                Customer selectedCustomer = tblCustomers.getSelectionModel().getSelectedItem();
+                customerList.set(customerList.indexOf(selectedCustomer),customer);
+                tblCustomers.refresh();
+
+            }
+            btnAddNew.fire();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            new Alert(Alert.AlertType.ERROR,"Failed to save the customer, try later!").show();
+        }
+    }
+
+    private boolean isDataValid(){
+        String name = txtCustomerName.getText().strip();
+        String address = txtCustomerAddress.getText().strip();
+        if (!name.matches("[A-Za-z ]{3,}")){
+            txtCustomerName.requestFocus();
+            txtCustomerName.selectAll();
+            return false;
+        }else if(address.length() < 3){
+            txtCustomerAddress.requestFocus();
+            txtCustomerAddress.selectAll();
+            return false;
+        }
+        return true;
     }
 
     public void btnDelete_OnAction(ActionEvent actionEvent) {
+
     }
 }
