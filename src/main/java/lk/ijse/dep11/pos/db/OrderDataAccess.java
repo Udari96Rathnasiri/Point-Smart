@@ -65,8 +65,12 @@ public class OrderDataAccess {
                 STM_UPDATE_STOCK.setString(2,orderItem.getCode());
                 STM_UPDATE_STOCK.executeUpdate();
             }
+            SingleConnectionDataSource.getInstance().getConnection().commit();
         } catch (SQLException e) {
+            SingleConnectionDataSource.getInstance().getConnection().rollback();
             throw new RuntimeException(e);
+        }finally {
+            SingleConnectionDataSource.getInstance().getConnection().setAutoCommit(false);
         }
     };
     public static String getLastOrderId() throws SQLException {
