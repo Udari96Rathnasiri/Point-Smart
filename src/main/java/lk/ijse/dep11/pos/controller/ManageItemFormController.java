@@ -36,25 +36,22 @@ public class ManageItemFormController {
     public JFXTextField txtUnitPrice;
 
     public void initialize(){
-        tblItems.getColumns().get(0).setCellValueFactory(new PropertyValueFactory<>("code"));
-        tblItems.getColumns().get(1).setCellValueFactory(new PropertyValueFactory<>("description"));
-        tblItems.getColumns().get(2).setCellValueFactory(new PropertyValueFactory<>("qty"));
-        tblItems.getColumns().get(3).setCellValueFactory(new PropertyValueFactory<>("unitPrice"));
+        String[] tblColumns = {"code","description","qty","unitPrice"};
+        for (int i = 0; i < tblColumns.length; i++) {
+            tblItems.getColumns().get(i).setCellValueFactory(new PropertyValueFactory<>(tblColumns[i]));
+        }
         btnDelete.setDisable(true);
         btnSave.setDefaultButton(true);
+        btnSave.setText("SAVE");
         try {
             tblItems.getItems().addAll(ItemDataAccess.getAllItems());
         }catch (Exception e){
             new Alert(Alert.AlertType.ERROR,"Failed to load the  items, try again later!").show();
             e.printStackTrace();
         }
-
+        Platform.runLater(txtCode::requestFocus);
         tblItems.getSelectionModel().selectedItemProperty().addListener((ov,prev,cur)->{
-            if (cur == null){
-                btnSave.setText("SAVE");
-                btnDelete.setDisable(true);
-                txtCode.setDisable(false);
-            }else {
+            if (cur != null){
                 btnSave.setText("UPDATE");
                 btnDelete.setDisable(false);
                 txtCode.setText(cur.getCode());
@@ -62,6 +59,11 @@ public class ManageItemFormController {
                 txtDescription.setText(cur.getDescription());
                 txtQtyOnHand.setText(cur.getQty()+"");
                 txtUnitPrice.setText(cur.getUnitPrice()+"");
+
+            }else {
+                btnSave.setText("SAVE");
+                btnDelete.setDisable(true);
+                txtCode.setDisable(false);
             }
         });
     }
@@ -91,9 +93,7 @@ public class ManageItemFormController {
                     Integer.parseInt(txtQtyOnHand.getText()), new BigDecimal(txtUnitPrice.getText()).setScale(2));
 
             if (btnSave.getText().equals("SAVE")) {
-                System.out.println(btnSave.getText());
                 if (ItemDataAccess.isItemExists(item.getCode())) {
-                    System.out.println(item.getCode());
                     new Alert(Alert.AlertType.ERROR, "Item code already exists").show();
                     txtCode.requestFocus();
                     txtCode.selectAll();
