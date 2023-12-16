@@ -18,6 +18,7 @@ import javafx.stage.Stage;
 import lk.ijse.dep11.pos.db.ItemDataAccess;
 import lk.ijse.dep11.pos.db.OrderDataAccess;
 import lk.ijse.dep11.pos.tm.Item;
+import org.eclipse.jdt.internal.compiler.batch.Main;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -69,13 +70,7 @@ public class ManageItemFormController {
     }
 
     public void navigateToHome(MouseEvent mouseEvent) throws IOException {
-        URL resource = this.getClass().getResource("/view/MainForm.fxml");
-        Parent root = FXMLLoader.load(resource);
-        Scene scene = new Scene(root);
-        Stage primaryStage = (Stage) (this.root.getScene().getWindow());
-        primaryStage.setScene(scene);
-        primaryStage.centerOnScreen();
-        Platform.runLater(primaryStage::sizeToScene);
+        MainFormController.navigateToMain(root);
     }
 
     public void btnAddNew_OnAction(ActionEvent actionEvent) {

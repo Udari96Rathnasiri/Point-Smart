@@ -109,13 +109,7 @@ public class PlaceOrderFormController {
     }
 
     public void navigateToHome(MouseEvent mouseEvent) throws IOException {
-        URL resource = this.getClass().getResource("/view/MainForm.fxml");
-        Parent root = FXMLLoader.load(resource);
-        Scene scene = new Scene(root);
-        Stage primaryStage = (Stage) (this.root.getScene().getWindow());
-        primaryStage.setScene(scene);
-        primaryStage.centerOnScreen();
-        Platform.runLater(primaryStage::sizeToScene);
+        MainFormController.navigateToMain(root);
     }
 
     public void newOrder() throws IOException {
@@ -139,7 +133,7 @@ public class PlaceOrderFormController {
             if (lastOrderId == null){
                 lblId.setText("Order ID: OD001");
             }else {
-                int newOrderId = Integer.parseInt(lastOrderId.substring(2) + 1);
+                int newOrderId = Integer.parseInt(lastOrderId.substring(2)) + 1;
                 lblId.setText(String.format("Order ID: OD%03d",newOrderId));
             }
         } catch (SQLException e) {
@@ -176,6 +170,7 @@ public class PlaceOrderFormController {
         }
         cmbItemCode.getSelectionModel().clearSelection();
         cmbItemCode.requestFocus();
+        txtQty.clear();
         calculateOrderTotal();
         enablePlaceOrderButton();
     }
