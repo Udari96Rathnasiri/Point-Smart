@@ -36,6 +36,16 @@ public class SearchOrdersFormController {
             new Alert(Alert.AlertType.ERROR,"Failed to load, try later!");
             navigateToHome(null);
         }
+
+        txtSearch.textProperty().addListener((ov,prev,cur)->{
+            tblOrders.getItems().clear();
+            try {
+                tblOrders.getItems().addAll(OrderDataAccess.findOrders(cur));
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        });
+
     }
     public void tblOrders_OnMouseClicked(MouseEvent mouseEvent) {
     }

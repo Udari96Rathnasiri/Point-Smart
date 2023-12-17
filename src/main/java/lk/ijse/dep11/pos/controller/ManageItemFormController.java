@@ -100,7 +100,6 @@ public class ManageItemFormController {
                 ItemDataAccess.updateItem(item);
                 ObservableList<Item> itemList = tblItems.getItems();
                 Item selectedItem = tblItems.getSelectionModel().getSelectedItem();
-                System.out.println(itemList.size());
                 itemList.set(itemList.indexOf(selectedItem), item);
                 tblItems.refresh();
             }
