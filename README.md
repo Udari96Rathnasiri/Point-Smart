@@ -18,6 +18,9 @@ Welcome to our cutting-edge Point of Sale (POS) system, designed to transform yo
 3. PostgreSQL
 4. JUnit
 
+### Snapshot
+![POS snapshot](./src/main/java/images/snapshot.png)
+
 ### License
 Copyright &copy; 2023 UdariRathnasiri. All Rights Reserved.<br>
 This project is licensed under the [MIT License](LICENSE.txt)
